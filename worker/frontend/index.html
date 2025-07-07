@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>✨ Girly Code Playground ✨</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code&family=Nunito:wght@500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --pink: #ffa3d7;
+      --peach: #ffcfdf;
+      --lav: #d9c4ff;
+      --mint: #caffef;
+      --text-dark: #333;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--peach), var(--lav));
+      font-family: "Nunito", sans-serif;
+    }
+    .card {
+      width: 90%;
+      max-width: 650px;
+      background: #fff;
+      border-radius: 28px;
+      padding: 32px;
+      box-shadow: 0 15px 40px rgba(255, 103, 164, 0.25);
+    }
+    h1 {
+      text-align: center;
+      margin: 0 0 24px;
+      font-size: 2rem;
+      background: linear-gradient(90deg, var(--pink), var(--lav));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    select, textarea, button {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      margin: 10px 0;
+      padding: 14px 16px;
+      font-family: "Fira Code", monospace;
+      font-size: 15px;
+    }
+    select { background: var(--mint); }
+    textarea {
+      height: 220px;
+      background: #fff7fb;
+      resize: none;
+      box-shadow: inset 0 0 6px #ffd1ec;
+    }
+    button {
+      cursor: pointer;
+      background: linear-gradient(90deg, var(--pink), var(--lav));
+      color: #fff;
+      font-weight: 700;
+      transition: transform 0.2s ease, box-shadow 0.2s;
+    }
+    button:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(255, 103, 164, 0.4); }
+    #output {
+      margin-top: 18px;
+      min-height: 70px;
+      background: #f6faff;
+      border: 2px dashed var(--mint);
+      border-radius: 14px;
+      padding: 14px;
+      white-space: pre-wrap;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+    .loading { text-align: center; color: #999; font-size: 14px; }
+    .error   { color: #e1147b; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>🦄 Code Playground</h1>
+
+    <select id="language">
+      <option value="python">Python 🐍</option>
+      <option value="c">C 💻</option>
+      <option value="cpp">C++ 🚀</option>
+      <option value="java">Java ☕</option>
+    </select>
+
+    <textarea id="code" placeholder="Write your magical code here…">print("Hello Navi! ✨")</textarea>
+
+    <button onclick="runCode()">✨ Run Code ✨</button>
+
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const API = "http://localhost:8000";
+
+    async function runCode() {
+      const code = document.getElementById("code").value;
+      const language = document.getElementById("language").value;
+      const out = document.getElementById("output");
+
+      out.innerHTML = '<div class="loading">⏳ Running…</div>';
+
+      try {
+        const res = await fetch(`${API}/run`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, language })
+        });
+        const { job_id } = await res.json();
+
+        let result;
+        for (let i = 0; i < 15; i++) {
+          const poll = await fetch(`${API}/result/${job_id}`);
+          result = await poll.json();
+          if (result.output) break;
+          await new Promise(r => setTimeout(r, 800));
+        }
+
+        const outputText = result.output || result.error || "⚠️ Timeout";
+        const isError = /error|traceback|Exception|unsupported/i.test(outputText);
+        out.innerHTML = `<span class="${isError ? 'error' : ''}">${outputText}</span>`;
+      } catch (e) {
+        out.innerHTML = `<span class="error">❌ Network error: ${e.message}</span>`;
+      }
+    }
+  </script>
+</body>
+</html>
