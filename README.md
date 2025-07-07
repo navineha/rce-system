@@ -8,7 +8,6 @@ An advanced, secure and girly-themed RCE system that lets you run Python, Java, 
 ### ⚙️ Tech Stack
 
 - 🐍 Backend: Python (FastAPI)
-- 🐳 Docker for containerized execution
 - 🧠 Redis for job queue
 - 🌐 Frontend: HTML, CSS, JavaScript (Vanilla)
 
