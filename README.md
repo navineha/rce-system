@@ -11,7 +11,7 @@ An advanced, secure and girly-themed RCE system that lets you run Python, Java, 
 - 🐳 Docker for containerized execution
 - 🧠 Redis for job queue
 - 🌐 Frontend: HTML, CSS, JavaScript (Vanilla)
-- 💖 Styled with love for a feminine dev vibe
+
 
 ---
 
